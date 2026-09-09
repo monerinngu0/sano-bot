@@ -1,0 +1,17 @@
+{
+  "name": "sano-bot",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --env-file=.env index.js",
+    "deploy": "node --env-file=.env deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0"
+  }
+}
