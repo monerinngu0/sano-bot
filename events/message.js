@@ -12,7 +12,7 @@ module.exports = {
     async execute(message) {
         if (message.author.bot) return;
         if (!message.content.trim()) return;
-        // さののおへや
+
         if (message.channel.id != TARGET_CHANNEL_ID) return;
 
         if (message.channel.id != TARGET_CHANNEL_ID) return;
