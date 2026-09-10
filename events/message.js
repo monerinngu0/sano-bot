@@ -15,6 +15,8 @@ module.exports = {
         // さののおへや
         if (message.channel.id != TARGET_CHANNEL_ID) return;
 
+        if (message.channel.id != TARGET_CHANNEL_ID) return;
+
         try {
             await saveMessage(message);
         } catch (error) {
@@ -58,3 +60,4 @@ module.exports = {
         }
     },
 };
+
