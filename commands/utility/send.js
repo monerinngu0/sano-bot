@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
+const { generateMarkov } = require('../../services/markovGenerator');
 
 module.exports = {
 	data: new SlashCommandBuilder()
