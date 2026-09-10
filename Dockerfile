@@ -1,7 +1,11 @@
 # ---------- C++ builder ----------
-FROM gcc:14 AS cpp-builder
+FROM node:24-bookworm-slim AS cpp-builder
 
 WORKDIR /build
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY cpp/markov.cpp ./markov.cpp
 
