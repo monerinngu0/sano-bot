@@ -10,7 +10,7 @@ module.exports = {
 
             if (!text) return;
 
-            await interaction.channel.send({
+            await interaction.reply({
                 content: text,
                 allowedMentions: {
                     parse: [],
