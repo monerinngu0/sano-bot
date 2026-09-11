@@ -1,10 +1,7 @@
 const { Events } = require('discord.js');
 const { saveMessage } = require('../services/messageStore');
 const { generateMarkov } = require('../services/markovGenerator');
-
-const TRIGGER_WORDS = ['佐野', 'ようた', 'おうた', 'さの', 'ゲイ', '黒人', 'ユダヤ教'];
-const RANDOM_REPLY_RATE = 1.00;
-const TARGET_CHANNEL_ID = '1504786234390872174';
+const { isTargetChannel, shouldReply } = require('../services/replyPolicy');
 
 module.exports = {
     name: Events.MessageCreate,
@@ -13,29 +10,26 @@ module.exports = {
         if (message.author.bot) return;
         if (!message.content.trim()) return;
 
-        if (message.channel.id != TARGET_CHANNEL_ID) return;
-
         try {
             await saveMessage(message);
         } catch (error) {
             console.error('Failed to save message:', error);
         }
 
-        const mentioned =
-            message.mentions.has(message.client.user);
+        // Replies are limited to specific channels.
+        if (!isTargetChannel(message.channel.id)) {
+            return;
+        }
 
-        const hasTriggerWord =
-            TRIGGER_WORDS.some(word =>
-                message.content.includes(word)
-            );
+        const reply = shouldReply({
+            mentioned: message.mentions.has(message.client.user),
+            content: message.content,
+            replyRate: Number(
+                process.env.RANDOM_REPLY_RATE ?? 0.15
+            )
+        });
 
-        const forced =
-            mentioned || hasTriggerWord;
-
-        const random =
-            Math.random() < RANDOM_REPLY_RATE;
-
-        if (!forced && !random) {
+        if (!reply) {
             return;
         }
 
@@ -58,4 +52,3 @@ module.exports = {
         }
     },
 };
-
