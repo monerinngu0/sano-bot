@@ -2,10 +2,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-const dataDir = path.join(__dirname, '..', 'data');
-
-const messagesPath = path.join(dataDir, 'messages.jsonl');
-const corpusPath = path.join(dataDir, 'corpus.tsv');
+const defaultDataDir = path.join(__dirname, '..', 'data');
 
 const tokenizerPath = path.join(
     __dirname,
@@ -13,6 +10,15 @@ const tokenizerPath = path.join(
     'python',
     'tokenizer.py',
 );
+
+function sanitizeForTraining(content) {
+    return content
+        .replace(/<@!?\d+>/g, '')
+        .replace(/<@&\d+>/g, '')
+        .replace(/<#\d+>/g, '')
+        .replace(/@everyone|@here/g, '')
+        .trim();
+}
 
 async function tokenize(text) {
     return new Promise((resolve, reject) => {
@@ -47,8 +53,24 @@ async function tokenize(text) {
     });
 }
 
-async function saveMessage(message) {
+async function saveMessage(
+    message,
+    {
+        dataDir = defaultDataDir,
+        tokenizeFn = tokenize,
+    } = {},
+) {
     await fs.mkdir(dataDir, { recursive: true });
+
+    const messagesPath = path.join(
+        dataDir,
+        'messages.jsonl',
+    );
+
+    const corpusPath = path.join(
+        dataDir,
+        'corpus.tsv',
+    );
 
     const record = {
         id: message.id,
@@ -59,26 +81,21 @@ async function saveMessage(message) {
         timestamp: message.createdAt.toISOString(),
     };
 
-    // 原文はそのまま保存
     await fs.appendFile(
         messagesPath,
         JSON.stringify(record) + '\n',
         'utf8',
     );
 
-    // 学習時だけDiscordのユーザーメンションを削除
-    const content = message.content
-        .replace(/<@!?\d+>/g, '')   // user
-        .replace(/<@&\d+>/g, '')    // role
-        .replace(/<#\d+>/g, '')     // channel
-        .replace(/@everyone|@here/g, '')
-        .trim();
+    const content = sanitizeForTraining(
+        message.content,
+    );
 
     if (!content) {
         return;
     }
 
-    const tokens = await tokenize(content);
+    const tokens = await tokenizeFn(content);
 
     if (tokens) {
         await fs.appendFile(
@@ -90,5 +107,6 @@ async function saveMessage(message) {
 }
 
 module.exports = {
+    sanitizeForTraining,
     saveMessage,
 };
