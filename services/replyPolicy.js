@@ -1,5 +1,5 @@
 const TRIGGER_WORDS = ['佐野', 'ようた', 'おうた', 'さの', 'ゲイ', '黒人', 'ユダヤ教'];
-const DEFAULT_REPLY_RATE = 0.15;
+const DEFAULT_REPLY_RATE = 1.0;
 const TARGET_CHANNEL_ID = '1504786234390872174';
 
 function hasTriggerWord(content) {
