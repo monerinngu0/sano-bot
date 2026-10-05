@@ -24,9 +24,6 @@ module.exports = {
         const reply = shouldReply({
             mentioned: message.mentions.has(message.client.user),
             content: message.content,
-            replyRate: Number(
-                process.env.RANDOM_REPLY_RATE ?? 0.15
-            )
         });
 
         if (!reply) {
